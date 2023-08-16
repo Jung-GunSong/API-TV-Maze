@@ -3,6 +3,7 @@
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
+const PLACEHOLDER_IMAGE = 'https://tinyurl.com/tv-missing';
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -13,25 +14,22 @@ const $searchForm = $("#searchForm");
  */
 
 async function getShowsByTerm(searchTerm) {
-  // ADD: Remove placeholder & make request to TVMaze search shows API.
   const q = searchTerm;//could throw error if not string
   const params = new URLSearchParams({ q });
-  const request = await fetch(`https://api.tvmaze.com/search/shows?${params}`);
+  const response = await fetch(`https://api.tvmaze.com/search/shows?${params}`);
 
-  const response = await request.json();
+  const data = await response.json();
 
-  const showArray = response.map((obj) => {
+  const showArray = data.map((obj) => {
     const newShow = {
       id: obj.show.id,
       name: obj.show.name,
       summary: obj.show.summary,
-      image: obj.show.image.medium || 'https://tinyurl.com/tv-missing'
+      image: obj.show.image ? obj.show.image.medium : PLACEHOLDER_IMAGE
     };
 
     return newShow;
   });
-
-  console.log(response)
 
   return showArray;
 }
