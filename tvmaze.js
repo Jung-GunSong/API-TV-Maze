@@ -4,6 +4,7 @@ const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
 const $searchForm = $("#searchForm");
 const PLACEHOLDER_IMAGE = 'https://tinyurl.com/tv-missing';
+const $episodeButton = $(".Show-getEpisodes");
 
 
 /** Given a search term, search for tv shows that match that query.
@@ -84,7 +85,34 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
   await searchShowsAndDisplay();
 });
 
+$episodeButton.on("click", displayEpisodes)
 
+async function getEpisodesOfShow(id){
+  const showId = id;
+  // const params = new URLSearchParams(id);
+  const response = await fetch(`http://api.tvmaze.com/shows/${id}/episodes`);
+
+  const data = await response.json();
+
+  console.log(data);
+
+  const episodes = data.map((obj) => {
+    const episode = {
+      id: obj.id,
+      name: obj.name,
+      season: obj.season,
+      number: obj.number
+    };
+
+    return episode;
+  })
+  console.log(`episodes are`, episodes);
+}
+
+function displayEpisodes(){
+
+}
+getEpisodesOfShow(1);
 /** Given a show ID, get from API and return (promise) array of episodes:
  *      { id, name, season, number }
  */
