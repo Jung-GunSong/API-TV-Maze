@@ -15,34 +15,23 @@ const $searchForm = $("#searchForm");
 async function getShowsByTerm(searchTerm) {
   // ADD: Remove placeholder & make request to TVMaze search shows API.
   const q = searchTerm;//could throw error if not string
-  // console.log(`q is `, q);
-  const params = new URLSearchParams({q});
-  // console.log(`params is`,params);
+  const params = new URLSearchParams({ q });
   const request = await fetch(`https://api.tvmaze.com/search/shows?${params}`);
 
   const response = await request.json();
-  // console.log(response);
 
-  const showArray = response.map((obj) => obj.show.id);
+  const showArray = response.map((obj) => {
+    const newShow = {
+      id: obj.show.id,
+      name: obj.show.name,
+      summary: obj.show.summary,
+      image: obj.show.image.medium || 'https://tinyurl.com/tv-missing'
+    };
 
-  // return [
-  //   {
-  //     id: 1767,
-  //     name: "The Bletchley Circle",
-  //     summary:
-  //       `<p><b>The Bletchley Circle</b> follows the journey of four ordinary
-  //          women with extraordinary skills that helped to end World War II.</p>
-  //        <p>Set in 1952, Susan, Millie, Lucy and Jean have returned to their
-  //          normal lives, modestly setting aside the part they played in
-  //          producing crucial intelligence, which helped the Allies to victory
-  //          and shortened the war. When Susan discovers a hidden code behind an
-  //          unsolved murder she is met by skepticism from the police. She
-  //          quickly realises she can only begin to crack the murders and bring
-  //          the culprit to justice with her former friends.</p>`,
-  //     image:
-  //         "http://static.tvmaze.com/uploads/images/medium_portrait/147/369403.jpg"
-  //   }
-  // ]
+    return newShow;
+  });
+
+  return showArray;
 }
 
 
@@ -90,7 +79,7 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
-$searchForm.on("submit", async function handleSearchForm (evt) {
+$searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
