@@ -2,6 +2,7 @@
 
 const $showsList = $("#showsList");
 const $episodesArea = $("#episodesArea");
+const $episodesList = $('#episodesList')
 const $searchForm = $("#searchForm");
 const PLACEHOLDER_IMAGE = 'https://tinyurl.com/tv-missing';
 const $episodeButton = $(".Show-getEpisodes");
@@ -80,21 +81,36 @@ async function searchShowsAndDisplay() {
   displayShows(shows);
 }
 
+/**
+ * Handles form submit and updates DOM with shows that match search criteria.
+ */
 $searchForm.on("submit", async function handleSearchForm(evt) {
   evt.preventDefault();
   await searchShowsAndDisplay();
 });
 
-$episodeButton.on("click", displayEpisodes)
 
+/**
+ * Handles button click to see episodes of a particular show and adds the list
+ * of episodes to the DOM after getting data back.
+ */
+$showsList.on('click', $episodeButton, async function handleGetEpisode(evt) {
+  //TODO: take a look at jQuery closest and see if we can use to refactor
+  const id = $(evt.target).parent().parent().parent().attr('data-show-id');
+
+  await getEpisodesAndDisplay(id);
+})
+
+
+/**
+ * @param {string} id - takes in string id and returns array of episode objects
+ * @returns {array} episodes {id, name, season, number}
+ */
 async function getEpisodesOfShow(id){
-  const showId = id;
   // const params = new URLSearchParams(id);
   const response = await fetch(`http://api.tvmaze.com/shows/${id}/episodes`);
 
   const data = await response.json();
-
-  console.log(data);
 
   const episodes = data.map((obj) => {
     const episode = {
@@ -106,21 +122,36 @@ async function getEpisodesOfShow(id){
 
     return episode;
   })
-  console.log(`episodes are`, episodes);
+
+  return episodes;
 }
 
-function displayEpisodes(){
 
-}
-getEpisodesOfShow(1);
-/** Given a show ID, get from API and return (promise) array of episodes:
- *      { id, name, season, number }
+/**
+ *
+ * @param {array} episodes - takes in array of episodes and appends a li for each
  */
+function displayEpisodes(episodes){
+  //TODO: clear the episode area before appending
+  //TODO: can leverage jQuery empty method
+  // $episodesArea.empty();
+  $episodesArea.show();
 
-// async function getEpisodesOfShow(id) { }
+  for (const episode of episodes) {
+    const newEpisodeLi = $(`<li>${episode.name} (season ${episode.season}, number ${episode.number})</li>`)
 
-/** Write a clear docstring for this function... */
+    $episodesList.append(newEpisodeLi);
+  }
 
-// function displayEpisodes(episodes) { }
+}
 
-// add other functions that will be useful / match our structure & design
+/**
+ *
+ * @param {string} id - takes in an id in the form of a string, gets episodes
+ * of show, and then appends them to the DOM
+ */
+async function getEpisodesAndDisplay(id) {
+  const episodes = await getEpisodesOfShow(id);
+
+  displayEpisodes(episodes);
+}
