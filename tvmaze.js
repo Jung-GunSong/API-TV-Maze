@@ -96,7 +96,7 @@ $searchForm.on("submit", async function handleSearchForm(evt) {
  */
 $showsList.on('click', $episodeButton, async function handleGetEpisode(evt) {
   //TODO: take a look at jQuery closest and see if we can use to refactor
-  const id = $(evt.target).parent().parent().parent().attr('data-show-id');
+  const id = $(evt.target).closest(".Show").attr('data-show-id');
 
   await getEpisodesAndDisplay(id);
 })
@@ -104,7 +104,7 @@ $showsList.on('click', $episodeButton, async function handleGetEpisode(evt) {
 
 /**
  * @param {string} id - takes in string id and returns array of episode objects
- * @returns {array} episodes {id, name, season, number}
+ * @returns {Promise<array>} episodes array {id, name, season, number}
  */
 async function getEpisodesOfShow(id){
   // const params = new URLSearchParams(id);
@@ -132,9 +132,8 @@ async function getEpisodesOfShow(id){
  * @param {array} episodes - takes in array of episodes and appends a li for each
  */
 function displayEpisodes(episodes){
-  //TODO: clear the episode area before appending
-  //TODO: can leverage jQuery empty method
-  // $episodesArea.empty();
+
+  $episodesList.empty();
   $episodesArea.show();
 
   for (const episode of episodes) {
